@@ -6,15 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LocationUpdateRequest;
 use App\Models\FollowedPerson;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class LocationUpdateController extends Controller
 {
-    public function store(LocationUpdateRequest $request, FollowedPerson $followedPerson): JsonResponse
+    public function store(Request $request, FollowedPerson $followedPerson): JsonResponse
     {
-        $validated = $request->validated();
+        // $validated = $request->validated();
+        $validated = $request->all();
 
         Log::debug('Location update request received');
 
