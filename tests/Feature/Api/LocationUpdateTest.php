@@ -1,0 +1,57 @@
+<?php
+
+use App\Models\FollowedPerson;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+it('can store location update for a followed person', function () {
+    $person = FollowedPerson::create(['name' => 'John Doe']);
+
+    $payload = [
+        'lat' => 47.497913,
+        'lon' => 19.040236,
+        'acc' => 15.5,
+        'time' => now()->getTimestampMs(),
+        'batt' => 85,
+    ];
+
+    $response = $this->postJson(route('api.location.store', $person->id), $payload);
+
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    $this->assertDatabaseHas('location_updates', [
+        'followed_person_id' => $person->id,
+        'latitude' => 47.497913,
+        'longitude' => 19.040236,
+        'accuracy' => 15.5,
+        'battery_level' => 85,
+    ]);
+
+    $this->assertDatabaseHas('followed_person', [
+        'id' => $person->id,
+        'last_latitude' => 47.497913,
+        'last_longitude' => 19.040236,
+        'last_accuracy' => 15.5,
+        'last_battery_level' => 85,
+    ]);
+});
+
+it('validates required fields', function () {
+    $person = FollowedPerson::create(['name' => 'John Doe']);
+
+    $response = $this->postJson(route('api.location.store', $person->id), []);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['lat', 'lon']);
+});
+
+it('returns 404 for non-existent person', function () {
+    $response = $this->postJson('/api/location/00000000-0000-0000-0000-000000000000', [
+        'lat' => 47.497913,
+        'lon' => 19.040236,
+    ]);
+
+    $response->assertStatus(404);
+});

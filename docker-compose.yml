@@ -1,0 +1,21 @@
+services:
+    gpslogger:
+        build:
+            context: .
+        container_name: gpslogger
+        volumes:
+            - .:/var/www/html
+        environment:
+            PHP_IDE_CONFIG: serverName=gpslogger
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            - dev-network
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.gpslogger.rule=Host(`gpslogger.local`)"
+            - "traefik.http.routers.gpslogger.entrypoints=web"
+
+networks:
+    dev-network:
+        external: true
