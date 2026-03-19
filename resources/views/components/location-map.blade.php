@@ -140,6 +140,7 @@ new class extends Component
                 let popup = `<strong>${isLatest ? '📍 Legutóbbi' : '#' + (index + 1)}</strong><br>`;
                 popup += `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}<br>`;
                 if (loc.accuracy) popup += `Pontosság: ${loc.accuracy}m<br>`;
+                if (loc.battery) popup += `Töltöttség: ${loc.battery}%<br>`;
                 popup += `<small>${loc.recorded_at}</small>`;
 
                 marker.bindPopup(popup);
