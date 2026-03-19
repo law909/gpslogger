@@ -13,7 +13,7 @@ it('can store location update for a followed person', function () {
         'lat' => 47.497913,
         'lon' => 19.040236,
         'acc' => 15.5,
-        'time' => now()->getTimestampMs(),
+        'time' => now()->toIso8601ZuluString('millisecond'),
         'batt' => 85,
     ];
 
@@ -55,9 +55,11 @@ it('logs incoming data before saving', function () {
         'lat' => 47.497913,
         'lon' => 19.040236,
         'acc' => 10,
-        'time' => now()->getTimestampMs(),
+        'time' => now()->toIso8601ZuluString('millisecond'),
         'batt' => 50,
     ];
+
+    Log::shouldReceive('debug')->andReturnNull();
 
     Log::shouldReceive('channel')
         ->with('location')
