@@ -55,3 +55,44 @@ it('respects the limit parameter', function () {
         ->call('loadLocations')
         ->assertCount('locations', 2);
 });
+
+it('filters locations by date', function () {
+    $person = FollowedPerson::factory()->create();
+
+    LocationUpdate::factory()->count(2)->create([
+        'followed_person_id' => $person->id,
+        'recorded_at' => '2025-06-15 10:00:00',
+    ]);
+
+    LocationUpdate::factory()->count(3)->create([
+        'followed_person_id' => $person->id,
+        'recorded_at' => '2025-06-16 12:00:00',
+    ]);
+
+    Livewire::test('location-map')
+        ->set('personId', $person->id)
+        ->set('date', '2025-06-15')
+        ->call('loadLocations')
+        ->assertCount('locations', 2);
+});
+
+it('returns all locations when no date is specified', function () {
+    $person = FollowedPerson::factory()->create();
+
+    LocationUpdate::factory()->count(2)->create([
+        'followed_person_id' => $person->id,
+        'recorded_at' => '2025-06-15 10:00:00',
+    ]);
+
+    LocationUpdate::factory()->count(3)->create([
+        'followed_person_id' => $person->id,
+        'recorded_at' => '2025-06-16 12:00:00',
+    ]);
+
+    Livewire::test('location-map')
+        ->set('personId', $person->id)
+        ->set('date', '')
+        ->set('limit', 100)
+        ->call('loadLocations')
+        ->assertCount('locations', 5);
+});

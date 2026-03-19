@@ -12,6 +12,9 @@ new class extends Component
     #[Url]
     public int $limit = 10;
 
+    #[Url]
+    public string $date = '';
+
     /** @var array<int, array{lat: float, lng: float, recorded_at: string, accuracy: float|null}> */
     public array $locations = [];
 
@@ -41,10 +44,14 @@ new class extends Component
 
         $this->personName = $person->name;
 
-        $updates = $person->locationUpdates()
-            ->latest('recorded_at')
-            ->limit($this->limit)
-            ->get();
+        $query = $person->locationUpdates()
+            ->latest('recorded_at');
+
+        if (filled($this->date)) {
+            $query->whereDate('recorded_at', $this->date);
+        }
+
+        $updates = $query->limit($this->limit)->get();
 
         if ($updates->isEmpty()) {
             $this->errorMessage = 'Nincsenek helyadatok ehhez a személyhez.';
@@ -67,11 +74,14 @@ new class extends Component
     <h1 class="mb-6 text-2xl font-semibold text-zinc-900 dark:text-white">Tartózkodási helyek térképen</h1>
 
     <form wire:submit="loadLocations" class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end">
-        <div class="w-full sm:w-32">
+        <div class="w-full sm:flex-1">
             <flux:input wire:model="personId" label="Person ID" placeholder="Személy azonosító..." />
         </div>
         <div>
             <flux:input wire:model="limit" label="Limit" type="number" min="1" max="1000" />
+        </div>
+        <div>
+            <flux:input wire:model="date" label="Dátum" type="date" />
         </div>
         <div>
             <flux:button type="submit" variant="primary" wire:loading.attr="disabled">
