@@ -57,6 +57,7 @@ new class extends Component
             'lng' => (float) $u->longitude,
             'recorded_at' => $u->recorded_at,
             'accuracy' => $u->accuracy ? (float) $u->accuracy : null,
+            'battery_level' => $u->battery_level,
         ])->all();
     }
 };
@@ -140,7 +141,7 @@ new class extends Component
                 let popup = `<strong>${isLatest ? '📍 Legutóbbi' : '#' + (index + 1)}</strong><br>`;
                 popup += `${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}<br>`;
                 if (loc.accuracy) popup += `Pontosság: ${loc.accuracy}m<br>`;
-                if (loc.battery) popup += `Töltöttség: ${loc.battery}%<br>`;
+                if (loc.battery_level) popup += `Töltöttség: ${loc.battery_level}%<br>`;
                 popup += `<small>${loc.recorded_at}</small>`;
 
                 marker.bindPopup(popup);
