@@ -16,6 +16,8 @@ class LocationUpdateController extends Controller
     {
         $validated = $request->validated();
 
+        Log::debug('Location update request received');
+
         Log::channel('location')->info('Location update received', [
             'followed_person_id' => $followedPerson->id,
             'followed_person_name' => $followedPerson->name,
