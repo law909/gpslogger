@@ -3,19 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
 use App\Http\Requests\LocationUpdateRequest;
 use App\Models\FollowedPerson;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LocationUpdateController extends Controller
 {
     public function store(LocationUpdateRequest $request, FollowedPerson $followedPerson): JsonResponse
     {
         $validated = $request->validated();
+
+        Log::channel('location')->info('Location update received', [
+            'followed_person_id' => $followedPerson->id,
+            'followed_person_name' => $followedPerson->name,
+            'payload' => $request->all(),
+        ]);
 
         $recordedAt = isset($validated['time'])
             ? Carbon::createFromTimestampMs($validated['time'])

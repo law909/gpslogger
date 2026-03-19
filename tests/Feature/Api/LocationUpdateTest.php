@@ -2,6 +2,7 @@
 
 use App\Models\FollowedPerson;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 
 uses(RefreshDatabase::class);
 
@@ -45,6 +46,34 @@ it('validates required fields', function () {
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['lat', 'lon']);
+});
+
+it('logs incoming data before saving', function () {
+    $person = FollowedPerson::create(['name' => 'Logger Test']);
+
+    $payload = [
+        'lat' => 47.497913,
+        'lon' => 19.040236,
+        'acc' => 10,
+        'time' => now()->getTimestampMs(),
+        'batt' => 50,
+    ];
+
+    Log::shouldReceive('channel')
+        ->with('location')
+        ->once()
+        ->andReturnSelf();
+
+    Log::shouldReceive('info')
+        ->once()
+        ->withArgs(function (string $message, array $context) use ($person, $payload) {
+            return $message === 'Location update received'
+                && $context['followed_person_id'] === $person->id
+                && $context['payload']['lat'] === $payload['lat'];
+        });
+
+    $this->postJson(route('api.location.store', $person->id), $payload)
+        ->assertStatus(200);
 });
 
 it('returns 404 for non-existent person', function () {
