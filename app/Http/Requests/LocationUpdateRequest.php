@@ -26,7 +26,7 @@ class LocationUpdateRequest extends FormRequest
             'lat' => ['required', 'numeric', 'between:-90,90'],
             'lon' => ['required', 'numeric', 'between:-180,180'],
             'acc' => ['nullable', 'numeric'],
-            'time' => ['nullable', 'numeric'],
+            'time' => ['nullable', 'string'],
             'batt' => ['nullable', 'numeric', 'between:0,100'],
         ];
     }
