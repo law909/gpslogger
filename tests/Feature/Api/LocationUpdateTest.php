@@ -78,6 +78,28 @@ it('logs incoming data before saving', function () {
         ->assertStatus(200);
 });
 
+it('converts recorded_at from UTC to app timezone before saving', function () {
+    config(['app.timezone' => 'Europe/Budapest']);
+    date_default_timezone_set('Europe/Budapest');
+
+    $person = FollowedPerson::create(['name' => 'Timezone Test']);
+
+    $utcTime = '2026-03-20T10:00:00.000Z';
+
+    $payload = [
+        'lat' => 47.497913,
+        'lon' => 19.040236,
+        'time' => $utcTime,
+    ];
+
+    $this->postJson(route('api.location.store', $person->id), $payload)
+        ->assertStatus(200);
+
+    $locationUpdate = $person->locationUpdates()->first();
+
+    expect($locationUpdate->recorded_at)->toBe('2026-03-20 11:00:00');
+});
+
 it('returns 404 for non-existent person', function () {
     $response = $this->postJson('/api/location/00000000-0000-0000-0000-000000000000', [
         'lat' => 47.497913,

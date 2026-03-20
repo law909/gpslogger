@@ -16,14 +16,8 @@ class LocationUpdateController extends Controller
     {
         $validated = $request->validated();
 
-        Log::channel('location')->info('Location update received', [
-            'followed_person_id' => $followedPerson->id,
-            'followed_person_name' => $followedPerson->name,
-            'payload' => $request->all(),
-        ]);
-
         $recordedAt = isset($validated['time'])
-            ? Carbon::parse($validated['time'])
+            ? Carbon::parse($validated['time'])->setTimezone(config('app.timezone'))
             : now();
 
         DB::transaction(function () use ($followedPerson, $validated, $recordedAt) {
