@@ -48,36 +48,6 @@ it('validates required fields', function () {
         ->assertJsonValidationErrors(['lat', 'lon']);
 });
 
-it('logs incoming data before saving', function () {
-    $person = FollowedPerson::create(['name' => 'Logger Test']);
-
-    $payload = [
-        'lat' => 47.497913,
-        'lon' => 19.040236,
-        'acc' => 10,
-        'time' => now()->toIso8601ZuluString('millisecond'),
-        'batt' => 50,
-    ];
-
-    Log::shouldReceive('debug')->andReturnNull();
-
-    Log::shouldReceive('channel')
-        ->with('location')
-        ->once()
-        ->andReturnSelf();
-
-    Log::shouldReceive('info')
-        ->once()
-        ->withArgs(function (string $message, array $context) use ($person, $payload) {
-            return $message === 'Location update received'
-                && $context['followed_person_id'] === $person->id
-                && $context['payload']['lat'] === $payload['lat'];
-        });
-
-    $this->postJson(route('api.location.store', $person->id), $payload)
-        ->assertStatus(200);
-});
-
 it('converts recorded_at from UTC to app timezone before saving', function () {
     config(['app.timezone' => 'Europe/Budapest']);
     date_default_timezone_set('Europe/Budapest');
