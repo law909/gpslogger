@@ -15,6 +15,13 @@ new class extends Component
     #[Url]
     public string $date = '';
 
+    public function mount(): void
+    {
+        if (blank($this->date)) {
+            $this->date = now()->format('Y-m-d');
+        }
+    }
+
     /** @var array<int, array{lat: float, lng: float, recorded_at: string, accuracy: float|null}> */
     public array $locations = [];
 
