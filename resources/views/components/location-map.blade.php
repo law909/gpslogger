@@ -20,6 +20,10 @@ new class extends Component
         if (blank($this->date)) {
             $this->date = now()->format('Y-m-d');
         }
+
+        if (filled($this->personId)) {
+            $this->loadLocations();
+        }
     }
 
     /** @var array<int, array{lat: float, lng: float, recorded_at: string, accuracy: float|null}> */
